@@ -1,0 +1,28 @@
+{
+  "name": "findit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FindIt - aplicacao academica de achados e perdidos, etapa 1",
+  "main": "app.js",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js",
+    "seed": "node dados/seed.js"
+  },
+  "dependencies": {
+    "bcrypt": "6.0.0",
+    "better-sqlite3": "12.11.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "allowScripts": {
+    "better-sqlite3@12.11.1": true,
+    "bcrypt@6.0.0": true
+  }
+}

@@ -1,0 +1,9 @@
+# FindIt: ignorar dependencias, banco local e segredos.
+node_modules/
+.env
+*.db
+*.db-shm
+*.db-wal
+.DS_Store
+npm-debug.log*
+coverage/
