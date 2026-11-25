@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- FindIt - pagina inicial demonstrativa (camada front-end, etapa 1). -->
+<!-- FindIt - interface demonstrativa da etapa 2 (camada front-end). -->
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -10,15 +10,56 @@
 </head>
 <body>
   <main class="container">
-    <p class="etapa">PROJETO ACADÊMICO · ETAPA 1</p>
-    <h1>FindIt</h1>
-    <p class="subtitulo">Achados e Perdidos</p>
-    <p>Estrutura do projeto criada. Nesta etapa, o objetivo é verificar que o servidor e o banco de dados iniciam corretamente.</p>
-    <section class="painel" aria-live="polite">
-      <h2>Estado da API</h2>
-      <p id="estado-api">Verificando conexão...</p>
+    <header class="cabecalho">
+      <p class="etapa">PROJETO ACADÊMICO · ETAPA 2</p>
+      <h1>FindIt</h1>
+      <p class="subtitulo">Achados e Perdidos</p>
+      <p>Cadastro e autenticação de usuários com Node.js, Express, SQLite e JWT.</p>
+    </header>
+
+    <section class="painel status-api" aria-live="polite">
+      <h2>Conexão com a API</h2>
+      <p id="estado-api">Carregando...</p>
     </section>
-    <p class="nota">Cadastro, login, listagem de itens e solicitações serão desenvolvidos nas próximas etapas.</p>
+
+    <div class="grade">
+      <section class="painel">
+        <h2>Entrar</h2>
+        <p class="ajuda">Use uma conta de demonstração ou a conta que você cadastrar.</p>
+        <form id="form-login">
+          <label for="login-email">E-mail</label>
+          <input id="login-email" name="email" type="email" autocomplete="username" required />
+          <label for="login-senha">Senha</label>
+          <input id="login-senha" name="senha" type="password" autocomplete="current-password" required />
+          <button type="submit">Fazer login</button>
+        </form>
+        <p id="estado-login" class="estado" role="status" aria-live="polite">Preencha o formulário.</p>
+      </section>
+
+      <section class="painel">
+        <h2>Criar conta</h2>
+        <p class="ajuda">Novas contas recebem sempre o perfil de usuário comum.</p>
+        <form id="form-cadastro">
+          <label for="cadastro-nome">Nome</label>
+          <input id="cadastro-nome" name="nome" minlength="2" maxlength="100" required />
+          <label for="cadastro-email">E-mail</label>
+          <input id="cadastro-email" name="email" type="email" autocomplete="email" required />
+          <label for="cadastro-senha">Senha (mínimo de 8 caracteres)</label>
+          <input id="cadastro-senha" name="senha" type="password" minlength="8" autocomplete="new-password" required />
+          <button type="submit">Cadastrar</button>
+        </form>
+        <p id="estado-cadastro" class="estado" role="status" aria-live="polite">Preencha o formulário.</p>
+      </section>
+    </div>
+
+    <section id="painel-usuario" class="painel" hidden>
+      <div class="linha-topo"><h2>Minha sessão</h2><button id="botao-sair" type="button" class="botao-secundario">Sair</button></div>
+      <p id="usuario-atual" aria-live="polite"></p>
+      <button id="botao-admin" type="button" hidden>Consultar relatório administrativo</button>
+      <p id="estado-admin" role="status" aria-live="polite"></p>
+    </section>
+
+    <p class="nota">Próximas etapas: cadastro de itens encontrados, solicitações e devoluções. A tela de autenticação já usa a API real.</p>
   </main>
 </body>
 </html>

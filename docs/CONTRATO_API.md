@@ -1,13 +1,14 @@
-<!-- FindIt - contrato HTTP projetado (documentacao da etapa 1). -->
+<!-- FindIt - contrato HTTP atualizado na etapa 2; rotas futuras ainda sinalizadas. -->
 # FindIt — contrato inicial da API
 
-> **Status de desenvolvimento:** somente `GET /api/saude` funciona na etapa 1. Todas as rotas abaixo marcadas como **planejada** serão implementadas na etapa 2/3. O contrato define o que front e back devem esperar.
+> **Status de desenvolvimento:** autenticação e relatório administrativo estão funcionando na etapa 2. As rotas de itens e solicitações permanecem planejadas para etapas posteriores.
 
 | Método | Rota | Papel/permissão | Respostas esperadas | Situação |
 |---|---|---|---|---|
 | GET | `/api/saude` | Público | 200, 500 | **Implementada** |
-| POST | `/api/auth/cadastro` | Público; papel fixado em `usuario` | 201, 400, 409 | Planejada |
-| POST | `/api/auth/login` | Público | 200, 400, 401, 429 | Planejada |
+| POST | `/api/auth/cadastro` | Público; papel fixado em `usuario` | 201, 400, 409 | **Implementada** |
+| POST | `/api/auth/login` | Público | 200, 400, 401, 429 | **Implementada** |
+| GET | `/api/auth/me` | JWT válido | 200, 401 | **Implementada** |
 | GET | `/api/itens` | Público | 200 | Planejada |
 | GET | `/api/itens/:id` | Público | 200, 404 | Planejada |
 | POST | `/api/itens` | Autenticado | 201, 400, 401 | Planejada |
@@ -17,13 +18,17 @@
 | POST | `/api/itens/:id/solicitacoes` | Autenticado; item disponível | 201, 400, 401, 404, 409 | Planejada |
 | GET | `/api/solicitacoes/minhas` | Autenticado; apenas as próprias | 200, 401 | Planejada |
 | GET | `/api/solicitacoes/recebidas` | Autenticado; apenas itens próprios | 200, 401 | Planejada |
-| GET | `/api/admin/relatorio` | Apenas `administrador` | 200, 401, 403 | Planejada |
+| GET | `/api/admin/relatorio` | Apenas `administrador` | 200, 401, 403 | **Implementada (totais)** |
 
 ## Contratos de exemplo
 
 **POST `/api/auth/cadastro`:** `{ "nome": "Ana", "email": "ana@example.com", "senha": "..." }`. O cliente **não escolhe** seu papel.
 
-**POST `/api/auth/login`:** `{ "email": "ana@example.com", "senha": "..." }`. Sucesso: `{ "token": "...", "usuario": { "id": 1, "nome": "Ana", "papel": "usuario" } }`.
+**POST `/api/auth/login`:** `{ "email": "ana@example.com", "senha": "..." }`. Sucesso: `{ "token": "...", "usuario": { "id": 1, "nome": "Ana", "email": "ana@example.com", "papel": "usuario" } }`. JWT expira após 2 horas; envie `Authorization: Bearer TOKEN` nas rotas protegidas.
+
+**GET `/api/auth/me`:** exige JWT e devolve `{ "usuario": { "id": 1, "nome": "Ana", "email": "ana@example.com", "papel": "usuario" } }`.
+
+**GET `/api/admin/relatorio`:** exige JWT e perfil `administrador`; devolve `{ "resumo": { "usuarios": 2, "itens": 2, "solicitacoes": 1 } }` (contagens variam conforme o banco).
 
 **POST `/api/itens`:** `{ "titulo": "Carteira marrom", "descricao": "Carteira de couro encontrada", "local_encontrado": "Biblioteca", "data_encontro": "2026-11-24" }`. O campo `cadastrado_por` é obtido **do JWT**, nunca confiado ao corpo.
 
