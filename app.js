@@ -1,6 +1,6 @@
 /**
- * FindIt - entrada HTTP da aplicacao (camada de apresentacao/API).
- * Etapa 1: servidor estatico, health-check e tratamento centralizado de erros.
+ * FindIt - entrada HTTP e composicao da API (camada de apresentacao/API).
+ * Etapa 2: cadastro, login JWT, perfil atual e relatorio administrativo protegido.
  */
 require('dotenv').config();
 const path = require('node:path');
@@ -8,30 +8,40 @@ const express = require('express');
 const helmet = require('helmet');
 const { abrirBanco } = require('./dados/conexao');
 const { tratarErro, rotaNaoEncontrada } = require('./middleware/erros');
+const rotasAutenticacao = require('./rotas/autenticacao');
+const rotasAdmin = require('./rotas/admin');
 
 const app = express();
-app.use(helmet()); // Headers basicos de seguranca antes das rotas.
-app.use(express.json({ limit: '20kb' })); // Limita corpos excessivos.
+app.disable('x-powered-by');
+app.use(helmet()); // Headers de seguranca aplicados antes dos recursos.
+app.use(express.json({ limit: '20kb' })); // Evita corpos JSON excessivamente grandes.
 app.use(express.static(path.join(__dirname, 'publico')));
 
-/** Endpoint simples para verificar o servidor e o banco na etapa 1. */
 app.get('/api/saude', (req, res, next) => {
   try {
     const banco = abrirBanco();
-    banco.prepare('SELECT 1 FROM usuarios LIMIT 1').get();
-    banco.close();
-    res.status(200).json({ status: 'ok', projeto: 'FindIt', etapa: 1 });
+    try { banco.prepare('SELECT 1 FROM usuarios LIMIT 1').get(); }
+    finally { banco.close(); }
+    res.status(200).json({ status: 'ok', projeto: 'FindIt', etapa: 2 });
   } catch (erro) {
-    // Falhar explicitamente quando o banco ainda nao foi preparado com npm run seed.
-    next(new Error('Banco nao inicializado. Execute npm run seed antes de iniciar o servidor.'));
+    next(new Error('Banco nao inicializado. Execute npm run seed.'));
   }
 });
 
-// As demais rotas REST sao CONTRATO PLANEJADO e serao implementadas na etapa 2.
+app.use('/api/auth', rotasAutenticacao);
+app.use('/api/admin', rotasAdmin);
 app.use('/api', rotaNaoEncontrada);
 app.use(tratarErro);
 
-const porta = Number(process.env.PORT) || 3000;
-app.listen(porta, () => {
-  console.log(`FindIt iniciado: http://localhost:${porta}`);
-});
+// Permite que os testes importem o app sem iniciar outra porta HTTP.
+if (require.main === module) {
+  if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+    console.error('Configure JWT_SECRET no .env com pelo menos 32 caracteres.');
+    process.exitCode = 1;
+  } else {
+    const porta = Number(process.env.PORT) || 3000;
+    app.listen(porta, () => console.log(`FindIt iniciado: http://localhost:${porta}`));
+  }
+}
+
+module.exports = app;
